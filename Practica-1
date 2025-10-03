@@ -57,6 +57,5 @@ const usuariosDePrueba = [
 const resultadoProcesado = procesarUsuarios(usuariosDePrueba);
 console.log(`Resultado procesado: ${resultadoProcesado}`); // Debería imprimir "Nombre: Juan, Username: juanito, Nombre: Maria, Username: mariita"
 
-EJERCICIO 3
 
 
