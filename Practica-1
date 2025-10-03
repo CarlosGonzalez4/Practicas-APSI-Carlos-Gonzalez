@@ -1,0 +1,62 @@
+carpeta/practica-1
+
+EJERCICIO 1
+
+function sumaRecursiva(arr: number[]): number {;
+    if(arr.length === 0){
+        return 0;
+    }
+    return arr[0] + sumaRecursiva(arr.slice(1));
+}
+
+//la funcion slice te permite eliminar un elemento en una posicion especifica por lo que al pasarlo de forma recursiva 
+//elimino el numero que ya he sumado
+
+// Ejemplo de uso:
+const numeros = [1, 2, 3, 4, 5];
+const resultadoSuma = sumaRecursiva(numeros);
+console.log(`La suma recursiva es: ${resultadoSuma}`); // Debería imprimir 15
+
+
+EJERCICIO 2
+
+interface Usuario {
+  id: number;
+  name: string;
+  username: string;
+  email: string;
+}
+ 
+function procesarUsuarios(usuarios: Usuario[]): string {
+    const filtrar = usuarios.filter(usuario => usuario.id < 5);
+    //primero filtro con el metodo filter para eliminar a los usuarios con un id mayor que 5
+
+    const transformar = filtrar.map(filtrar => `Nombre: ${filtrar.name}, Username: ${filtrar.username}`);
+    //segundo tranformo el contenido de usuario con el metodo map para que su formato sea Nombre y Username
+
+    const reducir = transformar.reduce((acc, act) => {
+        if(acc === " "){
+            return act;
+        }else{
+            return acc + ", " + act;
+        }
+    }, " ");
+    //por ultimo reduzco el array a un solo string que contiene todos los strings con el metodo reduce
+
+    return reducir;
+
+}
+ 
+// Ejemplo de uso (puedes crear un array de usuarios de prueba):
+const usuariosDePrueba = [
+    { id: 1, name: 'Juan', username: 'juanito', email: 'juan@example.com' },
+    { id: 2, name: 'Maria', username: 'mariita', email: 'maria@example.com' },
+    { id: 6, name: 'Pedro', username: 'pedrito', email: 'pedro@example.com' }
+];
+ 
+const resultadoProcesado = procesarUsuarios(usuariosDePrueba);
+console.log(`Resultado procesado: ${resultadoProcesado}`); // Debería imprimir "Nombre: Juan, Username: juanito, Nombre: Maria, Username: mariita"
+
+EJERCICIO 3
+
+
