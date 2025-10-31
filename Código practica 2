@@ -1,0 +1,101 @@
+const express = require('express');
+const mongoose = require('mongoose');
+const morgan = require('morgan');
+const cors = require('cors');
+
+const app = express();
+const PORT = process.env.PORT || 3000;
+
+// Middleware
+app.use(cors());
+app.use(express.json());
+app.use(morgan('dev'));
+
+// Manejo de JSON inválido
+app.use((err, req, res, next) => {
+  if (err instanceof SyntaxError && err.status === 400 && 'body' in err) {
+    return res.status(400).json({ message: 'Invalid JSON body' });
+  }
+  next();
+});
+
+// Modelo de libro
+const bookSchema = new mongoose.Schema({
+  title: { type: String, required: true },
+  author: { type: String, required: true },
+  pages: { type: Number, required: true }
+}, { timestamps: true });
+
+const Book = mongoose.model('Book', bookSchema);
+
+// Endpoints
+
+// Crear libro
+app.post('/api/books', async (req, res) => {
+  try {
+    const { title, author, pages } = req.body;
+    if (!title || !author || typeof pages !== 'number') {
+      return res.status(400).json({ message: 'Invalid or missing fields' });
+    }
+    const newBook = await Book.create({ title, author, pages });
+    res.status(201).json(newBook);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
+// Obtener todos los libros
+app.get('/api/books', async (req, res) => {
+  try {
+    const books = await Book.find();
+    res.status(200).json(books);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
+// Actualizar libro
+app.put('/api/books/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const updates = req.body;
+    if (Object.keys(updates).length === 0) {
+      return res.status(400).json({ message: 'No fields provided' });
+    }
+    const book = await Book.findByIdAndUpdate(id, updates, { new: true });
+    if (!book) return res.status(404).json({ message: 'Not found' });
+    res.status(200).json(book);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
+// Eliminar libro
+app.delete('/api/books/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const deleted = await Book.findByIdAndDelete(id);
+    if (!deleted) return res.status(404).json({ message: 'Not found' });
+    res.status(200).json({ message: 'Deleted successfully' });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
+// Ruta no existente
+app.use((req, res) =>{ res.status(404).json({ message: 'Not found' })});
+
+// Conectar a MongoDB Atlas y arrancar servidor
+const MONGO_URI = "mongodb+srv://CarlosGonzalez:Jovellanos79@clusterpractica2.aoeowh8.mongodb.net/booksdb?retryWrites=true&w=majority";
+
+mongoose.connect(MONGO_URI)
+  .then(() => {
+    console.log('Conectado a MongoDB Atlas');
+    app.listen(PORT, () => console.log(`Servidor en puerto ${PORT}`));
+  })
+  .catch(err => console.error('Error conectando a MongoDB', err));
+
